@@ -7,27 +7,25 @@
 
 ---
 
-## Backend Deployment (Render/Railway)
-
-### Option 1: Render.com (Free)
+## Backend Deployment (Railway.app)
 
 1. **Create Account**
-   - Go to [render.com](https://render.com)
+   - Go to [railway.app](https://railway.app)
    - Sign up with GitHub
 
 2. **Deploy Backend**
-   - Click "New" → "Web Service"
-   - Connect your GitHub repository
-   - Select the `backend` folder
-   - Configure:
-     - Build Command: `npm install`
-     - Start Command: `npm start`
-   - Add Environment Variables:
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your repository
+   - Railway will automatically detect the `railway.toml` and use the `backend/Dockerfile`.
+   - Add Environment Variables in the "Variables" tab:
      ```
      MONGODB_URI=your-mongodb-atlas-uri
      OPENAI_API_KEY=your-openai-key
      JWT_SECRET=your-secret-key
      PORT=3001
+     FIREBASE_CLIENT_EMAIL=...
+     FIREBASE_PRIVATE_KEY=...
+     FRONTEND_URL=your-vercel-app-url
      ```
 
 3. **Deploy Frontend**
@@ -36,20 +34,11 @@
    - Select the `frontend` folder
    - Add Environment Variable:
      ```
-     NEXT_PUBLIC_API_URL=your-backend-url
+     NEXT_PUBLIC_API_URL=https://your-railway-app-url/api
      ```
 
-### Option 2: Railway
-
-1. **Create Account**
-   - Go to [railway.app](https://railway.app)
-
-2. **Deploy**
-   - Click "New Project"
-   - Connect GitHub repo
-   - Add environment variables in Railway dashboard
-
 ---
+
 
 ## Database Setup (MongoDB Atlas)
 

@@ -1,16 +1,23 @@
-const { Client } = require('whatsapp-web.js');
+const { Client, RemoteAuth } = require('whatsapp-web.js');
+const { MongoStore } = require('wwebjs-mongo');
+const mongoose = require('mongoose');
 const orchestrator = require('./agents/orchestrator');
 
 let client = null;
 let isReady = false;
 
 const initializeWhatsApp = () => {
+  const store = new MongoStore({ mongoose: mongoose });
+  
   client = new Client({
+    authStrategy: new RemoteAuth({
+        store: store,
+        backupSyncIntervalMs: 300000
+    }),
     puppeteer: {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
-    },
-    sessionPath: process.env.WHATSAPP_SESSION_PATH || './whatsapp-session'
+    }
   });
 
   client.on('qr', (qr) => {

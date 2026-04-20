@@ -17,14 +17,26 @@ const shortTermMemory = require('./memory/shortTerm');
 
 const app = express();
 const server = http.createServer(app);
+
+// Use trust proxy for production (Render/Heroku/etc)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST']
+    origin: frontendUrl,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: frontendUrl,
+  credentials: true
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
@@ -98,6 +110,10 @@ const startServer = async () => {
   try {
     await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
     console.log('[MongoDB] Connected successfully');
+    
+    // Initialize bots
+    const whatsapp = require('./bots/whatsapp');
+    whatsapp.initializeWhatsApp();
   } catch (err) {
     console.log('[MongoDB] Not available - running in demo mode');
   }
