@@ -107,21 +107,26 @@ const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/jarvis';
 
 const startServer = async () => {
+  // Listen immediately so healthchecks pass
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`[Server] JARVIS running on http://0.0.0.0:${PORT}`);
+    console.log('[Status] Starting background initializations...');
+  });
+
   try {
-    await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
+    console.log('[MongoDB] Connecting to cluster...');
+    await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
     console.log('[MongoDB] Connected successfully');
     
     // Initialize bots
     const whatsapp = require('./bots/whatsapp');
     whatsapp.initializeWhatsApp();
+    
+    console.log('[Mode] Multi-agent system fully online');
   } catch (err) {
-    console.log('[MongoDB] Not available - running in demo mode');
+    console.error('[Startup] Initialization error:', err.message);
+    console.log('[Mode] Running in limited/demo mode');
   }
-  
-  server.listen(PORT, () => {
-    console.log(`[Server] JARVIS running on http://localhost:${PORT}`);
-    console.log(`[Mode] ${mongoose.connection.readyState === 1 ? 'Connected' : 'Demo Mode'}`);
-  });
 };
 
 startServer();
